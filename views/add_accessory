@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Accessory</title>
+</head>
+<body>
+    <h1>Add Accessory</h1>
+    <form action="/accessories/add" method="post">
+        <label for="accessory_name">Name:</label>
+        <input type="text" name="accessory_name" required><br>
+
+        <label for="price">Price:</label>
+        <input type="number" name="price" required><br>
+
+        <input type="submit" value="Add Accessory">
+    </form>
+    <br>
+    <a href="/accessories">Back to Accessories</a>
+</body>
+</html>
