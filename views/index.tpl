@@ -3,10 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mobiles Application</title>
+    <title>Flower Database</title>
 </head>
 <body>
-    <h1>Welcome to the Mobiles Application</h1>
-    <p>Explore the mobiles and accessories!</p>
+    <h1>Welcome to the Flower Database</h1>
+    <p>Explore flowers and their colors!</p>
+    <p><a href="/flowers">View Flowers</a></p>
+    <p><a href="/colors">View Colors</a></p>
 </body>
 </html>

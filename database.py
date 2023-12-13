@@ -1,70 +1,53 @@
-from bottle import Bottle, template, request, redirect
-from database import Database
+import sqlite3
 
-app = Bottle()
-db = Database()
+class Database:
+    def __init__(self, db_name):
+        self.conn = sqlite3.connect(db_name)
+        self.cursor = self.conn.cursor()
+        self.create_tables()
 
-# Routes
+    def create_tables(self):
+        # Create flowers table
+        self.cursor.execute('''
+            CREATE TABLE IF NOT EXISTS flowers (
+                flower_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                flower_name TEXT NOT NULL,
+                description TEXT NOT NULL
+            )
+        ''')
 
-@app.route('/')
-def index():
-    return template('index')
+        # Create colors table
+        self.cursor.execute('''
+            CREATE TABLE IF NOT EXISTS colors (
+                color_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                color_name TEXT NOT NULL,
+                flower_id INTEGER,
+                FOREIGN KEY (flower_id) REFERENCES flowers(flower_id)
+            )
+        ''')
 
-# Mobiles CRUD
+        self.conn.commit()
 
-@app.route('/mobiles')
-def mobiles():
-    query = "SELECT * FROM mobiles"
-    result = db.fetch_all(query)
-    return template('mobiles', rows=result)
+    def execute_query(self, query, params=None):
+        if params is None:
+            self.cursor.execute(query)
+        else:
+            self.cursor.execute(query, params)
+        self.conn.commit()
 
-@app.route('/mobiles/add', method='GET')
-def add_mobile_form():
-    return template('add_mobile')
+    def fetch_all(self, query, params=None):
+        if params is None:
+            self.cursor.execute(query)
+        else:
+            self.cursor.execute(query, params)
+        return self.cursor.fetchall()
 
-@app.route('/mobiles/add', method='POST')
-def add_mobile():
-    brand = request.forms.get('brand')
-    model = request.forms.get('model')
-    price = request.forms.get('price')
+    def fetch_one(self, query, params=None):
+        if params is None:
+            self.cursor.execute(query)
+        else:
+            self.cursor.execute(query, params)
+        return self.cursor.fetchone()
 
-    query = "INSERT INTO mobiles (brand, model, price) VALUES (?, ?, ?)"
-    params = (brand, model, price)
-    db.execute_query(query, params)
-
-    redirect('/mobiles')
-
-# Accessories CRUD
-
-@app.route('/accessories')
-def accessories():
-    query = "SELECT * FROM accessories"
-    result = db.fetch_all(query)
-    return template('accessories', rows=result)
-
-@app.route('/accessories/add', method='GET')
-def add_accessory_form():
-    return template('add_accessory')
-
-@app.route('/accessories/add', method='POST')
-def add_accessory():
-    accessory_name = request.forms.get('accessory_name')
-    price = request.forms.get('price')
-
-    query = "INSERT INTO accessories (accessory_name, price) VALUES (?, ?)"
-    params = (accessory_name, price)
-    db.execute_query(query, params)
-
-    redirect('/accessories')
-
-# Static Routes
-@app.route('/static/<filename:path>')
-def static(filename):
-    return bottle.static_file(filename, root='./static')
-
-# Run the application
-if __name__ == '__main__':
-    run(app, host='localhost', port=8080, debug=True)
-
-# Close the database connection when the application exits
-atexit.register(db.close_connection)
+    def close_connection(self):
+        self.conn.close()
